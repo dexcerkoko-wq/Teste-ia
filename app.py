@@ -1,13 +1,12 @@
-from flask import Flask, request, send_file
+from mcp.server.fastmcp import FastMCP
 import subprocess, tempfile, os
 
-app = Flask(__name__)
+mcp = FastMCP("py-compiler")
 
-@app.route('/compile', methods=['POST'])
-def compile():
-    code = request.json.get('code')
-    if not code:
-        return {'error': 'Nenhum código enviado'}, 400
+@mcp.tool()
+def compile_python(code: str) -> str:
+    """Compila código Python e retorna o executável em base64."""
+    import base64
 
     with tempfile.TemporaryDirectory() as tmpdir:
         script = os.path.join(tmpdir, 'script.py')
@@ -26,10 +25,10 @@ def compile():
 
         exe = os.path.join(tmpdir, 'script')
         if not os.path.exists(exe):
-            return {'error': result.stderr}, 500
+            return f"Erro na compilação:\n{result.stderr}"
 
-        return send_file(exe, as_attachment=True,
-                         download_name='output.exe')
+        with open(exe, 'rb') as f:
+            return base64.b64encode(f.read()).decode()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    mcp.run(transport="streamable-http")
