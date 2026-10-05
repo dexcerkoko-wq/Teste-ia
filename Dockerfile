@@ -17,6 +17,7 @@ ENV DISPLAY=:0
 RUN wineboot --init
 
 RUN pip install flask pyinstaller
+RUN pip install mcp[cli] flask pyinstaller
 
 WORKDIR /app
 COPY app.py .
