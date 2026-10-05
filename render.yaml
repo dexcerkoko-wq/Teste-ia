@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: py-compiler
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: WINEPREFIX
+        value: /root/.wine
+      - key: WINEDEBUG
+        value: "-all"
