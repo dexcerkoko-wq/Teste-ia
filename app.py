@@ -15,13 +15,16 @@ def compile():
             f.write(code)
 
         result = subprocess.run(
-            ['wine', 'python', '-m', 'PyInstaller',
-             '--onefile', '--distpath', tmpdir, script],
+            ['pyinstaller', '--onefile',
+             '--distpath', tmpdir,
+             '--workpath', os.path.join(tmpdir, 'build'),
+             '--specpath', tmpdir,
+             script],
             cwd=tmpdir,
             capture_output=True, text=True
         )
 
-        exe = os.path.join(tmpdir, 'script.exe')
+        exe = os.path.join(tmpdir, 'script')
         if not os.path.exists(exe):
             return {'error': result.stderr}, 500
 
